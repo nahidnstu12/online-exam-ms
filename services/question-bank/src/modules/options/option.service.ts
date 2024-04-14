@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Questions } from '../questions/question.entity';
+import { CreateOptionDto } from './create-option.dto';
 import { Option } from './option.entity';
 import { OptionRepository } from './option.repository';
-import { CreateOptionDto } from './create-option.dto';
 
 @Injectable()
 export class OptionService {
@@ -10,10 +11,19 @@ export class OptionService {
     return this.qbRepository.findAll();
   }
 
-  async create(qb: CreateOptionDto): Promise<Option> {
+  async create(qb: CreateOptionDto, question: Questions) {
     try {
-      return this.qbRepository.store(qb);
+      const newOption = await this.qbRepository.save({
+        text: qb.text,
+        isCorrect: qb.isCorrect,
+      });
+      console.log('newoption', newOption, question.options);
+      question.options = [...question.options, newOption];
+      await question.save();
+      console.log('last hit');
+      // return this.qbRepository.store(qb);
     } catch (error) {
+      console.log(error);
       throw new Error(error.message);
     }
   }

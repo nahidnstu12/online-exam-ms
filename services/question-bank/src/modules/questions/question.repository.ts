@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Questions } from './question.entity';
 import { CreateQuestionDto } from './create-question.dto';
+import { Questions } from './question.entity';
 
 export class QuestionRepository extends Repository<Questions> {
   constructor(
@@ -17,6 +17,10 @@ export class QuestionRepository extends Repository<Questions> {
 
   public async findById(id: number): Promise<Questions | null> {
     return this.findOneBy({ id: id });
+  }
+
+  public async findOne(options): Promise<Questions | null> {
+    return this.findOne(options);
   }
 
   public async store(qb: CreateQuestionDto): Promise<Questions> {

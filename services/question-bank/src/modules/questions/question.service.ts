@@ -20,12 +20,19 @@ export class QuestionService {
 
   async findById(id: number): Promise<Questions> {
     try {
-      const qb = await this.qbRepository.findById(id);
+
+      const qb = await this.qbRepository.findOne({
+        where: { id },
+        relations: {
+          options: true,
+        },
+      });
       if (!qb) {
         throw new Error('Questions not found.');
       }
       return qb;
     } catch (error) {
+      console.log('questionservice find', error);
       throw new Error(error.message);
     }
   }
