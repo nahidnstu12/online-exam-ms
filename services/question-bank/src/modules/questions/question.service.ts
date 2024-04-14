@@ -1,28 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateQuestionDto } from './create-question.dto';
-import { Questions } from './question.entity';
-import { QuestionRepository } from './question.repository';
+import { Question } from './question.entity';
 
 @Injectable()
 export class QuestionService {
-  constructor(private readonly qbRepository: QuestionRepository) {}
-  findAll(): Promise<Questions[]> {
-    return this.qbRepository.findAll();
+  constructor(
+    @InjectRepository(Question)
+    private readonly qbRepository: Repository<Question>,
+  ) {}
+  findAll(): Promise<Question[]> {
+    return this.qbRepository.find();
   }
 
-  async create(qb: CreateQuestionDto): Promise<Questions> {
+  async create(qb: CreateQuestionDto): Promise<Question> {
     try {
-      return this.qbRepository.store(qb);
+      return this.qbRepository.save(qb);
     } catch (error) {
       throw new Error(error.message);
     }
   }
 
-  async findById(id: number): Promise<Questions> {
+  async findById(id: number): Promise<Question> {
     try {
-      const qb = await this.qbRepository.findById(id);
+      const qb = await this.qbRepository.findOne({
+        where: { id },
+        relations: ['options'],
+      });
       if (!qb) {
-        throw new Error('Questions not found.');
+        throw new Error('Question not found.');
       }
       return qb;
     } catch (error) {
@@ -30,10 +37,12 @@ export class QuestionService {
     }
   }
 
-  async update(id: number, qb: CreateQuestionDto): Promise<Questions> {
+  async update(id: number, body: CreateQuestionDto): Promise<Question> {
     try {
-      await this.findById(id);
-      return await this.qbRepository.updateOne(id, qb);
+      const qb = await this.qbRepository.findOne({ where: { id } });
+      if (!qb) return undefined;
+      Object.assign(qb, body);
+      return await this.qbRepository.save(qb);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -41,7 +50,7 @@ export class QuestionService {
 
   async delete(id: number) {
     try {
-      return await this.qbRepository.destroy(id);
+      return await this.qbRepository.delete(id);
     } catch (error) {
       throw new Error(error.message);
     }

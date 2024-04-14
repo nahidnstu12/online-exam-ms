@@ -1,40 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Question } from '../questions/question.entity';
-import { CreateOptionDto } from './create-option.dto';
-import { Option } from './option.entity';
+import { QuestionBank } from './bank.entity';
+import { CreateQuestionBankDto } from './create-bank.dto';
 
 @Injectable()
-export class OptionService {
+export class QuestionBankService {
   constructor(
-    @InjectRepository(Option)
-    private readonly repository: Repository<Option>,
+    @InjectRepository(QuestionBank)
+    private readonly repository: Repository<QuestionBank>,
   ) {}
-  findAll(): Promise<Option[]> {
+  findAll(): Promise<QuestionBank[]> {
     return this.repository.find();
   }
 
-  async create(data: CreateOptionDto, question: Question): Promise<Option> {
+  async create(data: CreateQuestionBankDto): Promise<QuestionBank> {
     try {
-      const newOption = await this.repository.save({
-        text: data.text,
-        isCorrect: data.isCorrect,
-      });
-      question.options = [...question.options, newOption];
-      await question.save();
-
-      return newOption;
+      return this.repository.save(data);
     } catch (error) {
       throw new Error(error.message);
     }
   }
 
-  async findById(id: number): Promise<Option> {
+  async findById(id: number): Promise<QuestionBank> {
     try {
       const data = await this.repository.findOne({ where: { id } });
       if (!data) {
-        throw new Error('Option not found.');
+        throw new Error('QuestionBank not found.');
       }
       return data;
     } catch (error) {
@@ -42,7 +34,7 @@ export class OptionService {
     }
   }
 
-  async update(id: number, body: CreateOptionDto): Promise<Option> {
+  async update(id: number, body: CreateQuestionBankDto): Promise<QuestionBank> {
     try {
       const data = await this.repository.findOne({ where: { id } });
       if (!data) return undefined;

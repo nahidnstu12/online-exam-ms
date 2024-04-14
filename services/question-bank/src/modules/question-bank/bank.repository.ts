@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateQuestionBankDto } from '../dto/create-question-bank.dto';
-import { QuestionBank } from '../entities/bank.entity';
+import { QuestionBank } from './bank.entity';
+import { CreateQuestionBankDto } from './create-bank.dto';
 
 export class BankRepository extends Repository<QuestionBank> {
   constructor(

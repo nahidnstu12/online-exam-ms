@@ -8,7 +8,7 @@ import {
 import { Option } from '../options/option.entity';
 
 @Entity('questions')
-export class Questions extends BaseEntity {
+export class Question extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

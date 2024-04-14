@@ -12,8 +12,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { IdParamValidation } from 'src/utils/decorator/idparam.validator';
-import { CreateQuestionBankDto } from './dto/create-question-bank.dto';
-import { QuestionBankService } from './question-bank.service';
+import { QuestionBankService } from './bank.service';
+import { CreateQuestionBankDto } from './create-bank.dto';
 
 @Controller('question-bank')
 export class QuestionBankController {
@@ -21,7 +21,7 @@ export class QuestionBankController {
   @Get()
   async getAll(@Res() response) {
     const results = await this.questionBankService.findAll();
-    return response.status(200).json({
+    return response.status(HttpStatus.OK).json({
       type: 'success',
       data: results,
       meta: {
@@ -35,13 +35,13 @@ export class QuestionBankController {
   async create(@Res() response, @Body() data: CreateQuestionBankDto) {
     try {
       const qb = await this.questionBankService.create(data);
-      return response.status(201).json({
+      return response.status(HttpStatus.CREATED).json({
         type: 'success',
         message: 'Question Bank has been created successfully',
         data: qb,
       });
     } catch (error) {
-      return response.status(500).json({
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         type: 'error',
         message: 'Something went wrong, Please try again later',
         data: null,
@@ -52,7 +52,7 @@ export class QuestionBankController {
   @Get('/:id')
   async getOne(@Res() response, @Param() { id }: IdParamValidation) {
     const result = await this.questionBankService.findById(id);
-    return response.status(200).json({
+    return response.status(HttpStatus.OK).json({
       type: 'success',
       data: result,
     });
