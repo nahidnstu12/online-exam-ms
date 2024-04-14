@@ -1,18 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { Option } from './option.entity';
-import { OptionRepository } from './option.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateOptionDto } from './create-option.dto';
+import { Option } from './option.entity';
 
 @Injectable()
 export class OptionService {
-  constructor(private readonly qbRepository: OptionRepository) {}
+  constructor(
+    @InjectRepository(Option)
+    private readonly qbRepository: Repository<Option>,
+  ) {}
   findAll(): Promise<Option[]> {
-    return this.qbRepository.findAll();
+    return this.qbRepository.find();
   }
 
   async create(qb: CreateOptionDto): Promise<Option> {
     try {
-      return this.qbRepository.store(qb);
+      return this.qbRepository.save(qb);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -20,7 +24,7 @@ export class OptionService {
 
   async findById(id: number): Promise<Option> {
     try {
-      const qb = await this.qbRepository.findById(id);
+      const qb = await this.qbRepository.findOne({ where: { id } });
       if (!qb) {
         throw new Error('Option not found.');
       }
@@ -30,10 +34,12 @@ export class OptionService {
     }
   }
 
-  async update(id: number, qb: CreateOptionDto): Promise<Option> {
+  async update(id: number, body: CreateOptionDto): Promise<Option> {
     try {
-      await this.findById(id);
-      return await this.qbRepository.updateOne(id, qb);
+      const qb = await this.qbRepository.findOne({ where: { id } });
+      if (!qb) return undefined;
+      Object.assign(qb, body);
+      return await this.qbRepository.save(qb);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -41,7 +47,7 @@ export class OptionService {
 
   async delete(id: number) {
     try {
-      return await this.qbRepository.destroy(id);
+      return await this.qbRepository.delete(id);
     } catch (error) {
       throw new Error(error.message);
     }
