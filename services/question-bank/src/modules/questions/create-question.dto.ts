@@ -10,4 +10,7 @@ export class CreateQuestionDto {
 
   @IsNotEmpty()
   questionType: string;
+
+  @IsNotEmpty()
+  questionBankId: number;
 }

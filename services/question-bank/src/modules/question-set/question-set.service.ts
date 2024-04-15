@@ -1,31 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateQuestionDto } from './create-question.dto';
-import { Question } from './question.entity';
+import { CreateQuestionSetDto } from './create-question-set.dto';
+import { QuestionSet } from './question-set.entity';
 
 @Injectable()
-export class QuestionService {
+export class QuestionSetService {
   constructor(
-    @InjectRepository(Question)
-    private readonly repository: Repository<Question>,
+    @InjectRepository(QuestionSet)
+    private readonly repository: Repository<QuestionSet>,
   ) {}
-  findAll(): Promise<Question[]> {
+  findAll(): Promise<QuestionSet[]> {
     return this.repository.find();
   }
 
-  async create(data: CreateQuestionDto, questionBank): Promise<Question> {
+  // todo: CreateQuestionSetDto error
+  async create(data: any, questionBank): Promise<QuestionSet> {
     try {
-      const newQuestion = await this.repository.save({
+      const newQuestionSet = await this.repository.save({
         title: data.title,
-        questionType: data.questionType,
-        mark: data.mark,
-        // isActive: data.isActive,
+        isNegetive: data.isNegetive,
+        isNegetiveNumber: data.isNegetiveNumber,
+        publish: data.publish,
       });
-      questionBank.questions = [...questionBank.questions, newQuestion];
+      questionBank.questionsets = [
+        ...questionBank.questionsets,
+        newQuestionSet,
+      ];
       await questionBank.save();
 
-      return newQuestion;
+      return newQuestionSet;
     } catch (error) {
       console.log('create question error:', error);
 
@@ -33,14 +37,14 @@ export class QuestionService {
     }
   }
 
-  async findById(id: number): Promise<Question> {
+  async findById(id: number): Promise<QuestionSet> {
     try {
       const qb = await this.repository.findOne({
         where: { id },
-        relations: ['options'],
+        // relations: ['options'],
       });
       if (!qb) {
-        throw new Error('Question not found.');
+        throw new Error('QuestionSet not found.');
       }
       return qb;
     } catch (error) {
@@ -48,7 +52,7 @@ export class QuestionService {
     }
   }
 
-  async update(id: number, body: CreateQuestionDto): Promise<Question> {
+  async update(id: number, body: CreateQuestionSetDto): Promise<QuestionSet> {
     try {
       const qb = await this.repository.findOne({ where: { id } });
       if (!qb) return undefined;

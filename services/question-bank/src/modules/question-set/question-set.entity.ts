@@ -3,14 +3,12 @@ import {
   Column,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Option } from '../options/option.entity';
 import { QuestionBank } from '../question-bank/bank.entity';
 
-@Entity('questions')
-export class Question extends BaseEntity {
+@Entity('questionsets')
+export class QuestionSet extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,22 +20,20 @@ export class Question extends BaseEntity {
   @Column({
     type: 'varchar',
   })
-  questionType: string;
+  isNegetive: boolean;
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  mark: number;
+  isNegetiveNumber: number;
 
   @Column({
     type: 'boolean',
     default: 1,
   })
-  isActive: boolean;
+  publish: boolean;
 
-  @OneToMany(() => Option, (option) => option.question)
-  options: Option[];
-
-  @ManyToOne(() => QuestionBank, (qb) => qb.questions)
+  @ManyToOne(() => QuestionBank, (qb) => qb.questionsets)
   questionBank: QuestionBank;
 }

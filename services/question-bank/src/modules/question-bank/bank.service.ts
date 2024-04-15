@@ -11,7 +11,7 @@ export class QuestionBankService {
     private readonly repository: Repository<QuestionBank>,
   ) {}
   findAll(): Promise<QuestionBank[]> {
-    return this.repository.find();
+    return this.repository.find({ relations: ['questions', 'questionsets'] });
   }
 
   async create(data: CreateQuestionBankDto): Promise<QuestionBank> {
@@ -24,7 +24,10 @@ export class QuestionBankService {
 
   async findById(id: number): Promise<QuestionBank> {
     try {
-      const data = await this.repository.findOne({ where: { id } });
+      const data = await this.repository.findOne({
+        where: { id },
+        relations: ['questions', 'questionsets'],
+      });
       if (!data) {
         throw new Error('QuestionBank not found.');
       }

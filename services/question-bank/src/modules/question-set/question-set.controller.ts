@@ -13,18 +13,18 @@ import {
 } from '@nestjs/common';
 import { IdParamValidation } from 'src/utils/decorator/idparam.validator';
 import { QuestionBankService } from '../question-bank/bank.service';
-import { CreateQuestionDto } from './create-question.dto';
-import { QuestionService } from './question.service';
+import { CreateQuestionSetDto } from './create-question-set.dto';
+import { QuestionSetService } from './question-set.service';
 
-@Controller('questions')
-export class QuestionsController {
+@Controller('question-sets')
+export class QuestionSetController {
   constructor(
-    private questionService: QuestionService,
+    private questionSetService: QuestionSetService,
     private bankService: QuestionBankService,
   ) {}
   @Get()
   async getAll(@Res() response) {
-    const results = await this.questionService.findAll();
+    const results = await this.questionSetService.findAll();
     return response.status(200).json({
       type: 'success',
       data: results,
@@ -36,27 +36,26 @@ export class QuestionsController {
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  async create(@Res() response, @Body() data: CreateQuestionDto) {
+  async create(@Res() response, @Body() data: CreateQuestionSetDto) {
     try {
       const bank = await this.bankService.findById(data.questionBankId);
-      const res = await this.questionService.create(data, bank);
+      const res = await this.questionSetService.create(data, bank);
       return response.status(HttpStatus.CREATED).json({
         type: 'success',
-        message: 'Question has been created successfully',
+        message: 'QuestionSet has been created successfully',
         data: res,
       });
     } catch (error) {
       return response.status(500).json({
         type: 'error',
         message: 'Something went wrong, Please try again later',
-        data: null,
       });
     }
   }
 
   @Get('/:id')
   async getOne(@Res() response, @Param() { id }: IdParamValidation) {
-    const result = await this.questionService.findById(id);
+    const result = await this.questionSetService.findById(id);
     return response.status(200).json({
       type: 'success',
       data: result,
@@ -67,13 +66,13 @@ export class QuestionsController {
   public async update(
     @Res() response,
     @Param() { id }: IdParamValidation,
-    @Body() updateqbDto: CreateQuestionDto,
+    @Body() updateqbDto: CreateQuestionSetDto,
   ) {
     try {
-      const user = await this.questionService.update(id, updateqbDto);
+      const user = await this.questionSetService.update(id, updateqbDto);
       return response.status(HttpStatus.OK).json({
         type: 'success',
-        message: 'Question has been updated successfully',
+        message: 'QuestionSet has been updated successfully',
         data: user,
       });
     } catch (error) {
@@ -87,10 +86,10 @@ export class QuestionsController {
   @Delete('/:id')
   public async delete(@Res() response, @Param() { id }: IdParamValidation) {
     try {
-      await this.questionService.delete(id);
+      await this.questionSetService.delete(id);
       return response.status(HttpStatus.OK).json({
         type: 'success',
-        message: 'Question has been deleted successfully',
+        message: 'QuestionSet has been deleted successfully',
       });
     } catch (error) {
       return response.status(HttpStatus.BAD_REQUEST).json({

@@ -8,14 +8,24 @@ import { QuestionBankController } from './question-bank/bank.controller';
 import { QuestionBank } from './question-bank/bank.entity';
 import { BankRepository } from './question-bank/bank.repository';
 import { QuestionBankService } from './question-bank/bank.service';
+import { QuestionSetController } from './question-set/question-set.controller';
+import { QuestionSet } from './question-set/question-set.entity';
+import { QuestionSetService } from './question-set/question-set.service';
 import { Question } from './questions/question.entity';
 import { QuestionRepository } from './questions/question.repository';
 import { QuestionService } from './questions/question.service';
 import { QuestionsController } from './questions/questions.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([QuestionBank, Question, Option])],
-  controllers: [QuestionBankController, QuestionsController, OptionController],
+  imports: [
+    TypeOrmModule.forFeature([QuestionBank, Question, Option, QuestionSet]),
+  ],
+  controllers: [
+    QuestionBankController,
+    QuestionsController,
+    OptionController,
+    QuestionSetController,
+  ],
   providers: [
     QuestionBankService,
     BankRepository,
@@ -23,6 +33,7 @@ import { QuestionsController } from './questions/questions.controller';
     QuestionService,
     OptionRepository,
     OptionService,
+    QuestionSetService,
   ],
 })
 export class QuestionBankModule {}
