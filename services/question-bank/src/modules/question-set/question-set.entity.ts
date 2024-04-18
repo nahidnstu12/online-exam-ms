@@ -2,10 +2,12 @@ import {
   BaseEntity,
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { QuestionBank } from '../question-bank/bank.entity';
+import { Question } from '../questions/question.entity';
 
 @Entity('questionsets')
 export class QuestionSet extends BaseEntity {
@@ -36,4 +38,7 @@ export class QuestionSet extends BaseEntity {
 
   @ManyToOne(() => QuestionBank, (qb) => qb.questionsets)
   questionBank: QuestionBank;
+
+  @ManyToMany(() => Question, (ques) => ques.questionsets)
+  questions: Question[];
 }

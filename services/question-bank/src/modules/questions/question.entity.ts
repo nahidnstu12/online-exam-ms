@@ -2,12 +2,15 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Option } from '../options/option.entity';
 import { QuestionBank } from '../question-bank/bank.entity';
+import { QuestionSet } from '../question-set/question-set.entity';
 
 @Entity('questions')
 export class Question extends BaseEntity {
@@ -40,4 +43,10 @@ export class Question extends BaseEntity {
 
   @ManyToOne(() => QuestionBank, (qb) => qb.questions)
   questionBank: QuestionBank;
+
+  @ManyToMany(() => QuestionSet, (qset) => qset.questions)
+  @JoinTable({
+    name: 'questionset-question',
+  })
+  questionsets: QuestionSet[];
 }

@@ -16,12 +16,14 @@ export class QuestionService {
 
   async create(data: CreateQuestionDto, questionBank): Promise<Question> {
     try {
+      // let newQuestion;
+
       const newQuestion = await this.repository.save({
         title: data.title,
         questionType: data.questionType,
         mark: data.mark,
-        // isActive: data.isActive,
       });
+
       questionBank.questions = [...questionBank.questions, newQuestion];
       await questionBank.save();
 
@@ -37,6 +39,12 @@ export class QuestionService {
     try {
       const qb = await this.repository.findOne({
         where: { id },
+        select: {
+          options: {
+            id: true,
+            text: true,
+          },
+        },
         relations: ['options'],
       });
       if (!qb) {

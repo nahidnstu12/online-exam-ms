@@ -8,7 +8,9 @@ const typeOrmConfig: PostgresConnectionOptions = {
   password: 'postgres',
   database: 'postgres',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: true,
+  synchronize: false,
+  migrations: [__dirname + '/dist/modules/others/migrations/*{.ts,.js}'],
+  migrationsTableName: 'migrations',
 };
 
 export default typeOrmConfig;

@@ -13,4 +13,6 @@ export class CreateQuestionDto {
 
   @IsNotEmpty()
   questionBankId: number;
+
+  questionsetIds: number[];
 }

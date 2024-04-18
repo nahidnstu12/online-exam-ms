@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { IdParamValidation } from 'src/utils/decorator/idparam.validator';
 import { QuestionBankService } from '../question-bank/bank.service';
+import { AssignQuestionQuestionSetDto } from './assign-question-set.dto';
 import { CreateQuestionSetDto } from './create-question-set.dto';
 import { QuestionSetService } from './question-set.service';
 
@@ -76,6 +77,33 @@ export class QuestionSetController {
         data: user,
       });
     } catch (error) {
+      return response.status(HttpStatus.BAD_REQUEST).json({
+        type: 'error',
+        message: 'Something went wrong, Please try again later',
+      });
+    }
+  }
+  @Put('/:id/questions')
+  public async questionAssign(
+    @Res() response,
+    @Param() { id }: IdParamValidation,
+    @Body() body: AssignQuestionQuestionSetDto,
+  ) {
+    try {
+      const qsetId = +id;
+      const questionIds = body.questionIds;
+      const user = await this.questionSetService.questionAssignToSet(
+        qsetId,
+        questionIds,
+      );
+      return response.status(HttpStatus.OK).json({
+        type: 'success',
+        message: 'QuestionSet has been updated successfully',
+        data: user,
+      });
+    } catch (error) {
+      console.log('questionset controller', error);
+
       return response.status(HttpStatus.BAD_REQUEST).json({
         type: 'error',
         message: 'Something went wrong, Please try again later',

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { Question } from '../questions/question.entity';
 import { CreateQuestionSetDto } from './create-question-set.dto';
 import { QuestionSet } from './question-set.entity';
 
@@ -9,9 +10,11 @@ export class QuestionSetService {
   constructor(
     @InjectRepository(QuestionSet)
     private readonly repository: Repository<QuestionSet>,
+    @InjectRepository(Question)
+    private questionRepository: Repository<Question>,
   ) {}
   findAll(): Promise<QuestionSet[]> {
-    return this.repository.find();
+    return this.repository.find({ relations: ['questions'] });
   }
 
   // todo: CreateQuestionSetDto error
@@ -23,6 +26,7 @@ export class QuestionSetService {
         isNegetiveNumber: data.isNegetiveNumber,
         publish: data.publish,
       });
+
       questionBank.questionsets = [
         ...questionBank.questionsets,
         newQuestionSet,
@@ -41,7 +45,19 @@ export class QuestionSetService {
     try {
       const qb = await this.repository.findOne({
         where: { id },
-        // relations: ['options'],
+        select: {
+          questions: {
+            id: true,
+            title: true,
+            questionType: true,
+            mark: true,
+            options: {
+              id: true,
+              text: true,
+            },
+          },
+        },
+        relations: ['questions', 'questions.options'],
       });
       if (!qb) {
         throw new Error('QuestionSet not found.');
@@ -61,6 +77,33 @@ export class QuestionSetService {
     } catch (error) {
       throw new Error(error.message);
     }
+  }
+
+  async questionAssignToSet(
+    setId: any,
+    questionIds: number[],
+  ): Promise<QuestionSet> {
+    const qset = await this.repository.findOne({
+      where: { id: setId },
+      relations: ['questions'],
+    });
+
+    if (!qset) {
+      throw new Error('Question Set not found');
+    }
+    const questions = await this.questionRepository.findBy({
+      id: In(questionIds),
+    });
+
+    if (!questions.length) {
+      throw new Error('No question found with the provided IDs');
+    }
+
+    qset.questions = questions;
+
+    console.log('questionset service', qset);
+
+    return this.repository.save(qset); // Save the updated student
   }
 
   async delete(id: number) {
