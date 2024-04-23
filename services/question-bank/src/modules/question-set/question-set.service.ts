@@ -14,7 +14,7 @@ export class QuestionSetService {
     private questionRepository: Repository<Question>,
   ) {}
   findAll(): Promise<QuestionSet[]> {
-    return this.repository.find({ relations: ['questions'] });
+    return this.repository.find({ relations: ['questions', 'exam'] });
   }
 
   // todo: CreateQuestionSetDto error
@@ -57,7 +57,7 @@ export class QuestionSetService {
             },
           },
         },
-        relations: ['questions', 'questions.options'],
+        relations: ['questions', 'questions.options', 'exam'],
       });
       if (!qb) {
         throw new Error('QuestionSet not found.');

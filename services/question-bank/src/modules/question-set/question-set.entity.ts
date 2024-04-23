@@ -4,8 +4,10 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Exam } from '../exams/exam.entity';
 import { QuestionBank } from '../question-bank/bank.entity';
 import { Question } from '../questions/question.entity';
 
@@ -41,4 +43,7 @@ export class QuestionSet extends BaseEntity {
 
   @ManyToMany(() => Question, (ques) => ques.questionsets)
   questions: Question[];
+
+  @OneToOne(() => Exam, (qb) => qb.questionset)
+  exam: Exam;
 }
